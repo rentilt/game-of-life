@@ -3,8 +3,8 @@ import pygame, sys , numpy as np
 pygame.init()
 
 # screen size
-H = 400
-W = 600
+H = 600
+W = 800
 gameDisplay = pygame.display.set_mode((W,H))
 
 
