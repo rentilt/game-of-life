@@ -1,4 +1,3 @@
-from display import Display
 import pygame, sys , numpy as np
 pygame.init()
 
@@ -17,23 +16,10 @@ sq_size = W//n
 board = [ [np.random.randint(2) for i in range(n)] for j in range(rows)]
 
 #beginning of logic
-
-"""
-board[2][2]=0;
-board[1][2]=1;
-board[3][2]=1;
-board[2][3]=1;
-board[2][1]=1;
-"""
-
 def draw_board(board):
-
-
     gameDisplay.fill((100,100,100))
-
     for i in range(1,rows+1):
         for j in range(1,n+1):
-            print(i,j)
             #check if current loop value is even
             if board[i-1][j-1]==0:
                 pygame.draw.rect(gameDisplay, (25,25,25),[sq_size*(i-1),sq_size*(j-1),sq_size,sq_size])
@@ -52,7 +38,7 @@ def play():
 
         draw_board(board)
         check_game()
-        pygame.time.wait(100)
+        pygame.time.wait(300)
 
 
 def check_game():
@@ -64,7 +50,7 @@ def check_game():
                 convertToLife(i,j)
 
 def convertToLife(i,j):
-  count = 0;
+  count = 0
   low_i = i-1 if (i-1>0) else 0
   low_j = j-1 if (j-1>0) else 0
 
@@ -87,14 +73,13 @@ def convertToLife(i,j):
     board[i][j]=1
 
 def convertToDeath(i,j):
-    count = 0;
+    count = 0
     low_i = i-1 if (i-1>0) else 0
     low_j = j-1 if (j-1>0) else 0
 
 
     hi_i = i+1 if (i+1<rows) else rows-1
     hi_j = j+1 if (j+1<n) else n-1
-    # print(i,j,low_i,hi_i,low_j,hi_j)
     for x in range(low_i,hi_i+1):
         for y in range(low_j,hi_j+1):
             if(x==y):
