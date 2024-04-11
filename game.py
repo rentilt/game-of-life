@@ -13,6 +13,7 @@ n = 20
 rows = H//n
 sq_size = W//n
 
+# convert mouse position to board coordinates
 def from_pos_to_cell(x, y):
     row = 0
     col = 0
@@ -24,7 +25,7 @@ def from_pos_to_cell(x, y):
 # init board
 board = [ [0 for i in range(n)] for j in range(n)]
 
-#beginning of logic
+# draw the board 
 def draw_board(board):
     gameDisplay.fill((100,100,100))
     for i in range(1,n+1):
@@ -42,16 +43,15 @@ def draw_board(board):
 
 def play():
     # make board
-    print("Draw the board using the mouse (left click add cell | Right click to start game)")
+    print("Draw the board using the mouse\n(Left click to change cell | Right click to start game)")
     while True:
         for event in pygame.event.get():
             if event.type == pygame.QUIT: sys.exit()
             elif event.type == pygame.MOUSEBUTTONDOWN: 
                 if event.button == 1:
                     x, y = from_pos_to_cell(event.pos[0], event.pos[1])
-                    board[x][y] = 1
+                    board[x][y] = (board[x][y] + 1) % 2
                 if event.button == 3:
-                    print("Break")
                     break
             draw_board(board)
         else:
@@ -65,9 +65,10 @@ def play():
 
         draw_board(board)
         compute_next_board()
-        pygame.time.wait(1000)
+        pygame.time.wait(1000)  # wait for a second
 
 
+# compute the next board state 
 def compute_next_board():
     old_state = copy.deepcopy(board)
     for i in range(n):
