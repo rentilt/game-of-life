@@ -1,9 +1,10 @@
 import pygame, sys , numpy as np
+import copy
 pygame.init()
 
 # screen size
 H = 600
-W = 800
+W = 600
 gameDisplay = pygame.display.set_mode((W,H))
 
 
@@ -12,13 +13,21 @@ n = 20
 rows = H//n
 sq_size = W//n
 
+def from_pos_to_cell(x, y):
+    row = 0
+    col = 0
+
+    row = x // sq_size
+    col = y // rows
+    return (row, col)
+
 # init board
-board = [ [np.random.randint(2) for i in range(n)] for j in range(rows)]
+board = [ [0 for i in range(n)] for j in range(n)]
 
 #beginning of logic
 def draw_board(board):
     gameDisplay.fill((100,100,100))
-    for i in range(1,rows+1):
+    for i in range(1,n+1):
         for j in range(1,n+1):
             #check if current loop value is even
             if board[i-1][j-1]==0:
@@ -32,67 +41,60 @@ def draw_board(board):
 
 
 def play():
-    while 1:
+    # make board
+    print("Draw the board using the mouse (left click add cell | Right click to start game)")
+    while True:
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT: sys.exit()
+            elif event.type == pygame.MOUSEBUTTONDOWN: 
+                if event.button == 1:
+                    x, y = from_pos_to_cell(event.pos[0], event.pos[1])
+                    board[x][y] = 1
+                if event.button == 3:
+                    print("Break")
+                    break
+            draw_board(board)
+        else:
+            continue 
+        break
+
+    print("Starting...")
+    while True:
         for event in pygame.event.get():
             if event.type == pygame.QUIT: sys.exit()
 
         draw_board(board)
-        check_game()
-        pygame.time.wait(300)
+        compute_next_board()
+        pygame.time.wait(1000)
 
 
-def check_game():
-    for i in range(rows):
+def compute_next_board():
+    old_state = copy.deepcopy(board)
+    for i in range(n):
         for j in range(n):
-            if(board[i][j]==1):
-                convertToDeath(i,j)
-            else:
-                convertToLife(i,j)
 
-def convertToLife(i,j):
-  count = 0
-  low_i = i-1 if (i-1>0) else 0
-  low_j = j-1 if (j-1>0) else 0
+            neighbors = count_neighbors(old_state, i,j)
 
+            state = old_state[i][j]
 
-  hi_i = i+1 if (i+1<rows) else rows-1
-  hi_j = j+1 if (j+1<n) else n-1
+            if state == 0 and neighbors == 3:
+                board[i][j] = 1
+            elif state == 1 and (neighbors < 2 or neighbors > 3):
+                board[i][j] = 0 
 
-  for x in range(low_i,hi_i+1):
-    for y in range(low_j,hi_j+1):
-      if(x==y):
-        continue
-
-      if(board[x][y]):
-        count+=1
-
-
-
-  if(count==3):
-    #print("Mudei para vida: " ,i , j)
-    board[i][j]=1
-
-def convertToDeath(i,j):
+# count the number of neighbors of a cell in the board
+def count_neighbors(grid, i,j):
     count = 0
-    low_i = i-1 if (i-1>0) else 0
-    low_j = j-1 if (j-1>0) else 0
+    for x in range(-1, 2):
+        for y in range(-1, 2):
+            # wrap around
+            row = (i+x) % n
+            col = (j+y) % n
+            count += grid[row][col]
+    count -= grid[i][j]
+    return count
 
 
-    hi_i = i+1 if (i+1<rows) else rows-1
-    hi_j = j+1 if (j+1<n) else n-1
-    for x in range(low_i,hi_i+1):
-        for y in range(low_j,hi_j+1):
-            if(x==y):
-                continue
-
-            if(board[x][y]==1):
-                count+=1
-
-
-    #print(count)
-    if(count<2 or count>3):
-    #    print("Mudei para morte: " ,i , j)
-        board[i][j]=0
 
 if __name__ == "__main__":
     play()
